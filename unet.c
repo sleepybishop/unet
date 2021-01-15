@@ -181,14 +181,28 @@ int unetUdpSendTo(char *err, int fd, char *addr, int port, void *buf, int len) {
   return nwritten;
 }
 
-int unetUdpRecvFrom(char *err, int fd, void *buf, int len) {
+int unetUdpRecvFrom(char *err, int fd, char *ip, size_t ip_len, int *port,
+                    void *buf, int len) {
   int nread = 0;
-  struct sockaddr_in sa;
-  socklen_t sa_len;
+  struct sockaddr_storage sa;
+  socklen_t sa_len = sizeof(sa);
   nread = recvfrom(fd, buf, len, 0, (struct sockaddr *)&sa, &sa_len);
   if (nread == -1) {
     unetSetError(err, "recvfrom: %s", strerror(errno));
     return UNET_ERR;
+  }
+  if (sa.ss_family == AF_INET) {
+    struct sockaddr_in *s = (struct sockaddr_in *)&sa;
+    if (ip)
+      inet_ntop(AF_INET, (void *)&(s->sin_addr), ip, ip_len);
+    if (port)
+      *port = ntohs(s->sin_port);
+  } else {
+    struct sockaddr_in6 *s = (struct sockaddr_in6 *)&sa;
+    if (ip)
+      inet_ntop(AF_INET6, (void *)&(s->sin6_addr), ip, ip_len);
+    if (port)
+      *port = ntohs(s->sin6_port);
   }
   return nread;
 }

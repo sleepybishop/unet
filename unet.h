@@ -51,6 +51,7 @@ int unetSetMulticastGroup(char *err, char *addr, int fd);
 int unetUdpSocket(char *err);
 int unetUdpServer(char *err, char *bindaddr, int port);
 int unetUdpSendTo(char *err, int fd, char *addr, int port, void *buf, int len);
-int unetUdpRecvFrom(char *err, int fd, void *buf, int len);
+int unetUdpRecvFrom(char *err, int fd, char *ip, size_t ip_len, int *port,
+                    void *buf, int len);
 
 #endif
