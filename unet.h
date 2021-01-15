@@ -43,8 +43,6 @@
 #define UNET_IP_ONLY (1 << 0)
 
 int unetSetBlock(char *err, int fd, int non_block);
-int unetSetSendBuffer(char *err, int fd, int buffsize);
-int unetMaximizeSendBuffer(char *err, int fd);
 int unetSetMulticastTTL(char *err, int fd, int ttl);
 int unetSetMulticastGroup(char *err, char *addr, int fd);
 

@@ -45,40 +45,6 @@ int unetSetBlock(char *err, int fd, int non_block) {
   return UNET_OK;
 }
 
-int unetSetSendBuffer(char *err, int fd, int buffsize) {
-  if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &buffsize, sizeof(buffsize)) ==
-      -1) {
-    unetSetError(err, "setsockopt SO_SNDBUF: %s", strerror(errno));
-    return UNET_ERR;
-  }
-  return UNET_OK;
-}
-
-int unetMaximizeSendBuffer(char *err, int fd) {
-  socklen_t intsize = sizeof(int);
-  int min, max, avg;
-  int old_size;
-
-  if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &old_size, &intsize) != 0) {
-    close(fd);
-    unetSetError(err, "getsockopt(SO_SNDBUF)");
-    return UNET_ERR;
-  }
-
-  min = old_size;
-  max = 256 * 1024 * 1024;
-
-  while (min <= max) {
-    avg = ((unsigned int)(min + max)) / 2;
-    if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (void *)&avg, intsize) == 0) {
-      min = avg + 1;
-    } else {
-      max = avg - 1;
-    }
-  }
-  return 0;
-}
-
 static int unetSetReuseAddr(char *err, int fd) {
   int yes = 1;
   if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
